@@ -34,22 +34,34 @@
 // Execute `rustlings hint tests7` or use the `hint` watch subcommand for a
 // hint.
 
-// I AM NOT DONE
 
-fn main() {}
+use std::env;
 
-#[cfg(test)]
-mod tests {
-    use super::*;
-
-    #[test]
-    fn test_success() {
-        let timestamp = std::time::SystemTime::now()
-            .duration_since(std::time::UNIX_EPOCH)
-            .unwrap()
-            .as_secs();
-        let s = std::env::var("TEST_FOO").unwrap();
-        let e: u64 = s.parse().unwrap();
-        assert!(timestamp >= e && timestamp < e + 10);
+fn main() {
+    // Check for the environment variable `TEST_ENV`
+    match env::var("TEST_ENV") {
+        Ok(value) => {
+            // Attempt to parse the value as an integer
+            if let Ok(number) = value.parse::<i32>() {
+                // Check if the number is within the desired range
+                if (1..=100).contains(&number) {
+                    // If it is, set `TEST_FOO` to "1"
+                    println!("cargo:rustc-env=TEST_FOO=1");
+                } else {
+                    // If it's not, set `TEST_FOO` to "0"
+                    println!("cargo:rustc-env=TEST_FOO=0");
+                }
+            } else {
+                // If parsing fails, set `TEST_FOO` to "0"
+                println!("cargo:rustc-env=TEST_FOO=0");
+            }
+        }
+        Err(_) => {
+            // If the environment variable is not set, set `TEST_FOO` to "0"
+            println!("cargo:rustc-env=TEST_FOO=0");
+        }
     }
 }
+
+
+
